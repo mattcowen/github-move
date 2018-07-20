@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|AnyCPU">
+      <Configuration>Debug</Configuration>
+      <Platform>AnyCPU</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|AnyCPU">
+      <Configuration>Release</Configuration>
+      <Platform>AnyCPU</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>2c6e6c63-ebcf-47eb-af49-adde796effbc</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PrepareForBuildDependsOn>
+    </PrepareForBuildDependsOn>
+  </PropertyGroup>
+  <Import Condition=" Exists('Deployment.targets') " Project="Deployment.targets" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+  <!-- vertag<:>start tokens<:>maj.min -->
+  <Import Condition=" Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Deployment\1.1\DeploymentProject.targets') " Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Deployment\1.1\DeploymentProject.targets" />
+  <!-- vertag<:>end -->
+  <ItemGroup>
+    <Content Include="azuredeploy.json" />
+    <Content Include="azuredeploy.parameters.json" />
+    <None Include="azuredeploy-sharepoint.json" />
+    <None Include="azurestackdeploy.parameters.json" />
+    <None Include="Deployment.targets">
+      <Visible>False</Visible>
+    </None>
+    <Content Include="Deploy-AzureResourceGroup.ps1" />
+    <Content Include="DSC\ConfigureBackupDC.ps1" />
+    <Content Include="DSC\CreatePrimaryDC.ps1" />
+    <Content Include="DSC\ExchangeWorkload.psd1" />
+    <Content Include="DSC\PrepareBackupDC.ps1" />
+    <Content Include="DSC\PrepareExchange.ps1" />
+    <Content Include="DSC\PrepareSharepoint.ps1" />
+    <Content Include="DSC\PrepareSqlServer.ps1" />
+    <Content Include="nestedtemplates\configure-sharepoint.json" />
+    <Content Include="nestedtemplates\configureADBDC.json" />
+    <Content Include="nestedtemplates\nic.json" />
+    <Content Include="nestedtemplates\sharepoint-server.json" />
+    <Content Include="nestedtemplates\sql-server.json" />
+    <Content Include="nestedtemplates\vnet-with-dns-server.json" />
+    <Content Include="nestedtemplates\vnet-with-vpn.json" />
+    <Content Include="nestedtemplates\vnet.json" />
+    <None Include="Tests\TestConfigureADBDC.ps1" />
+    <None Include="Tests\TestPrepareExchange-direct.ps1" />
+    <None Include="Tests\TestPrepareExchange.ps1" />
+    <None Include="Tests\TestPrepareSharepoint-direct.ps1" />
+    <None Include="Tests\TestPrepareSharepoint-invoke.ps1" />
+    <None Include="Tests\TestPrepareSharepoint.ps1" />
+    <None Include="Tests\TestPrepareSqlServer.ps1" />
+    <None Include="Useful\InstallModulesLocally.ps1" />
+    <None Include="Useful\LCMConfig.ps1" />
+    <None Include="Useful\SettingLCMconfig.ps1" />
+    <None Include="Useful\UploadToAzureFiles.ps1" />
+  </ItemGroup>
+  <Target Name="GetReferenceAssemblyPaths" />
+</Project>

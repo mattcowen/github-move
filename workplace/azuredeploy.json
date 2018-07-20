@@ -1,0 +1,1238 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "StorageAccount": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the new storage account created to store the VMs disks"
+      }
+    },
+    "sqlStorageAccount": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the new storage account created to store the VMs disks"
+      }
+    },
+    "storageAccountType": {
+      "type": "string",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ],
+      "metadata": {
+        "description": "The type of the Storage Account created"
+      },
+      "defaultValue": "Standard_LRS"
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Virtual Network to Create"
+      },
+      "defaultValue": "adVNET"
+    },
+    "virtualNetworkAddressRange": {
+      "type": "string",
+      "metadata": {
+        "description": "The address range of the new VNET in CIDR format"
+      },
+      "defaultValue": "14.0.0.0/8"
+    },
+    "adSubnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the subnet created in the new VNET"
+      },
+      "defaultValue": "controllers"
+    },
+    "adSubnet": {
+      "type": "string",
+      "metadata": {
+        "description": "The address range of the subnet created in the new VNET"
+      },
+      "defaultValue": "14.1.1.0/24"
+    },
+    "appsSubnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the subnet created in the new VNET"
+      },
+      "defaultValue": "apps"
+    },
+    "appsSubnet": {
+      "type": "string",
+      "metadata": {
+        "description": "The address range of the subnet created in the new VNET"
+      },
+      "defaultValue": "14.1.2.0/24"
+    },
+
+    "adPDCNicName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the NIC attached to the new PDC"
+      },
+      "defaultValue": "adPDCNic"
+    },
+    "adPDCNicIPAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "The IP address of the new AD Primary DC"
+      },
+      "defaultValue": "14.1.1.4"
+    },
+    "adBDCNicName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the NIC attached to the new Backup DC"
+      },
+      "defaultValue": "adBDCNic"
+    },
+    "adBDCNicIPAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "The IP address of the new AD BDC"
+      },
+      "defaultValue": "14.1.1.5"
+    },
+    "exchangeNicName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the NIC attached to the new Backup DC"
+      },
+      "defaultValue": "exchangeNic"
+    },
+    "exchangeNicIPAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "The IP address of the new AD BDC"
+      },
+      "defaultValue": "14.1.2.250"
+    },
+    "exchangeStorageSizeInGB": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Exchange Mailbox storage size in GB."
+      }
+    },
+    "sqlNicName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the NIC attached to the new SQL Server"
+      },
+      "defaultValue": "sqlNic"
+    },
+    "sqlNicIPAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "The IP address of the SQL "
+      },
+      "defaultValue": "14.1.2.245"
+    },
+    "sqlServerServiceAccountUserName": {
+      "type": "string",
+      "metadata": {
+        "description": "The SQL Server Service account name"
+      },
+      "defaultValue": "sqlservice"
+    },
+    "sharepointSetupUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "The sharepoint setup account name"
+      },
+      "defaultValue": "SpSetup"
+    },
+    "sharePointFarmUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "The sharepoint farm account name"
+      },
+      "defaultValue": "SpFarm"
+    },
+    "sharePointNicName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the NIC attached to the new Backup DC"
+      },
+      "defaultValue": "sharePointNic"
+    },
+    "sharePointIPAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "The IP address of the Share Point server"
+      },
+      "defaultValue": "14.1.2.240"
+    },
+    "adPDCVMName": {
+      "type": "string",
+      "metadata": {
+        "description": "The computer name of the Primary DC"
+      },
+      "defaultValue": "adPDC"
+    },
+    "adBDCVMName": {
+      "type": "string",
+      "metadata": {
+        "description": "The computer name of the Backup DC"
+      },
+      "defaultValue": "adBDC"
+    },
+    "exchangeVMName": {
+      "type": "string",
+      "metadata": {
+        "description": "The computer name of Exchange 2016"
+      },
+      "defaultValue": "exchange"
+    },
+    "sqlVMName": {
+      "type": "string",
+      "metadata": {
+        "description": "The computer name of SQL 2016"
+      },
+      "defaultValue": "sql"
+    },
+    "sharePointVMName": {
+      "type": "string",
+      "metadata": {
+        "description": "The computer name of SharePoint 2016"
+      },
+      "defaultValue": "sharePoint"
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Administrator of the new VM and Domain"
+      },
+      "defaultValue": "azureuser"
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password for the Administrator account of the new VM and Domain"
+      }
+    },
+    "adVMSize": {
+      "type": "string",
+      "allowedValues": [
+        "Standard_DS1_v2",
+        "Standard_DS2_v2",
+        "Standard_DS3_v2",
+        "Standard_DS4_v2"
+      ],
+      "metadata": {
+        "description": "The size of the VM Created"
+      },
+      "defaultValue": "Standard_DS1_v2"
+    },
+    "appsVMSize": {
+      "type": "string",
+      "allowedValues": [
+        "Standard_DS1_v2",
+        "Standard_DS2_v2",
+        "Standard_DS3_v2",
+        "Standard_DS4_v2"
+      ],
+      "metadata": {
+        "description": "The size of the VM Created"
+      },
+      "defaultValue": "Standard_DS2_v2"
+    },
+    "sqlVMSize": {
+      "type": "string",
+      "allowedValues": [
+        "Standard_DS1_v2",
+        "Standard_DS2_v2",
+        "Standard_DS3_v2",
+        "Standard_DS4_v2"
+      ],
+      "metadata": {
+        "description": "The size of the VM Created"
+      },
+      "defaultValue": "Standard_DS2_v2"
+    },
+    "imagePublisher": {
+      "type": "string",
+      "defaultValue": "MicrosoftWindowsServer",
+      "metadata": {
+        "description": "Image Publisher"
+      }
+    },
+    "imageOffer": {
+      "type": "string",
+      "defaultValue": "WindowsServer",
+      "metadata": {
+        "description": "Image Offer"
+      }
+    },
+    "imageSKU": {
+      "type": "string",
+      "defaultValue": "2016-Datacenter",
+      "metadata": {
+        "description": "Image SKU"
+      }
+    },
+    "adAvailabilitySetName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the availability set that the AD VM is created in"
+      },
+      "defaultValue": "adSet"
+    },
+    "appsAvailabilitySetName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the availability set that the AD VM is created in"
+      },
+      "defaultValue": "appsSet"
+    },
+    "domainName": {
+      "defaultValue": "mgc.local",
+      "type": "string",
+      "metadata": {
+        "description": "The FQDN of the AD Domain created "
+      }
+    },
+    "dnsPrefix": {
+      "defaultValue": "mgc",
+      "type": "string",
+      "metadata": {
+        "description": "The DNS prefix for the public IP address used by the Load Balancer"
+      }
+    },
+    "sharepoint2016ProductKey": {
+      "type": "string",
+      "metadata": {
+        "description": "Product key for SharePoint required for setup. e.g. XXXX-XXXX-XXXX-XXXX "
+      }
+    },
+    "exchangeISOUri": {
+      "type": "string",
+      "metadata": {
+        "description": "URL to the Exchange Server 2016 ISO"
+      }
+    },
+    "sharepoint2016Iso": {
+      "type": "string",
+      "metadata": {
+        "description": "URL to the SharePoint Server 2016 ISO"
+      }
+    },
+    "sqlServerIsoUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "URL to SQL Server ISO"
+      }
+    },
+    "vpnRootCertData": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The base64 encoded string of the certificate used to secure the VPN"
+      }
+    },
+    "sharepointPublicIpDnsName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "_artifactsLocation": {
+      "type": "string"
+    },
+    "_artifactsLocationSasToken": {
+      "type": "securestring"
+    }
+
+  },
+  "variables": {
+    "adLBFE": "LBFE",
+    "adLBBE": "LBBE",
+    "adPDCRDPNAT": "adPDCRDP",
+    "adBDCRDPNAT": "adBDCRDP",
+    "VnetID": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+    "adSubnetRef": "[concat(variables('VnetID'),'/subnets/',parameters('adSubnetName'))]",
+    "appsSubnetRef": "[concat(variables('VnetID'),'/subnets/',parameters('appsSubnetName'))]",
+    "adPDCNicId": "[resourceId('Microsoft.Network/networkInterfaces',parameters('adPDCNicName'))]",
+    "adPDCIPConfigID": "[concat(variables('adPDCNicId'),'/ipConfigurations/ipconfig1')]",
+    "adBDCNicId": "[resourceId('Microsoft.Network/networkInterfaces',parameters('adBDCNicName'))]",
+    "adBDCIPConfigID": "[concat(variables('adBDCNicId'),'/ipConfigurations/ipconfig1')]",
+    "adLBName": "adLoadBalancer",
+    "adlbID": "[resourceId('Microsoft.Network/loadBalancers',variables('adLBName'))]",
+    "adlbFEConfigID": "[concat(variables('adlbID'),'/frontendIPConfigurations/',variables('adLBFE'))]",
+    "adPDCRDPNATRuleID": "[concat(variables('adlbID'),'/inboundNatRules/',variables('adPDCRDPNAT'))]",
+    "adBDCRDPNATRuleID": "[concat(variables('adlbID'),'/inboundNatRules/',variables('adBDCRDPNAT'))]",
+    "adBEAddressPoolID": "[concat(variables('adlbID'),'/backendAddressPools/',variables('adLBBE'))]",
+    "adPDCDataDisk": "ADPDCDataDisk",
+    "adBDCDataDisk": "ADBDCDataDisk",
+    "exchangeDataDisk": "ExcDataDisk",
+    "sharepointDataDisk": "SharePointDataDisk",
+    "adDataDiskSize": 127,
+    "dataDiskSize": 127,
+    "vnetTemplateUri": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/vnet.json', parameters('_artifactsLocationSasToken'))]",
+    "nicTemplateUri": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/nic.json', parameters('_artifactsLocationSasToken'))]",
+    "vnetwithDNSTemplateUri": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/vnet-with-dns-server.json', parameters('_artifactsLocationSasToken'))]",
+    "configureADBDCTemplateUri": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/configureADBDC.json', parameters('_artifactsLocationSasToken'))]",
+    "adPDCModulesURL": "[concat(parameters('_artifactsLocation'),'/DSC/CreatePrimaryDC.zip', parameters('_artifactsLocationSasToken'))]",
+    "adPDCConfigurationFunction": "CreatePrimaryDC.ps1\\CreatePrimaryDC",
+    "adBDCPreparationModulesURL": "[concat(parameters('_artifactsLocation'),'/DSC/PrepareBackupDC.zip', parameters('_artifactsLocationSasToken'))]",
+    "adBDCPreparationFunction": "PrepareBackupDC.ps1\\PrepareBackupDC",
+    "adBDCConfigurationModulesURL": "[concat(parameters('_artifactsLocation'),'/DSC/ConfigureBackupDC.zip', parameters('_artifactsLocationSasToken'))]",
+    "adBDCConfigurationFunction": "ConfigureBackupDC.ps1\\ConfigureBackupDC",
+    "exchangeConfigurationModulesURL": "[concat(parameters('_artifactsLocation'),'/DSC/PrepareExchange.zip', parameters('_artifactsLocationSasToken'))]",
+    "exchangeConfigurationFunction": "PrepareExchange.ps1\\PrepareExchange",
+    "sharePointConfigurationModulesURL": "[concat(parameters('_artifactsLocation'),'/DSC/PrepareSharepoint.zip', parameters('_artifactsLocationSasToken'))]",
+    "sharePointConfigurationFunction": "PrepareSharepoint.ps1\\PrepareSharePoint",
+    "exchangeOSDiskName": "exchangeOSDisk",
+    "sharePointOSDiskName": "sharePointOSDisk",
+    "sqlVmTemplateUri": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/sql-server.json', parameters('_artifactsLocationSasToken'))]",
+    "sharepointTemplateUri": "[concat(parameters('_artifactsLocation'),'/nestedtemplates/sharepoint-server.json', parameters('_artifactsLocationSasToken'))]",
+    "spconfigDatabaseName": "SP_Config",
+    "spadministrationContentDatabaseName": "SP_AdminContent",
+    "spcontentDatabaseName": "SP_FarmContent",
+    "sharepointFarmName": "spFarm",
+    "spFQDN": "[concat(parameters('sharePointVMName'),'.',parameters('domainName'))]",
+    "sqlServerServiceAccountPassword": "[parameters('adminPassword')]",
+    "sharePointFarmPassphrasePassword": "[parameters('adminPassword')]",
+    "sharepointPublicIpName": "sharepointPublicIp"
+  },
+  "resources": [
+    
+    {
+      "name": "[parameters('StorageAccount')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2016-01-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+      },
+      "sku": { "name": "[parameters('storageAccountType')]" },
+      "kind": "Storage"
+    },
+    {
+      "name": "[parameters('adAvailabilitySetName')]",
+      "type": "Microsoft.Compute/availabilitySets",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]"
+    },
+    {
+      "name": "[parameters('appsAvailabilitySetName')]",
+      "type": "Microsoft.Compute/availabilitySets",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]"
+    },
+    {
+      "name": "VNet",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('vnetTemplateUri')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "virtualNetworkName": {
+            "value": "[parameters('virtualNetworkName')]"
+          },
+          "virtualNetworkAddressRange": {
+            "value": "[parameters('virtualNetworkAddressRange')]"
+          },
+          "subnetName": {
+            "value": "[parameters('adSubnetName')]"
+          },
+          "subnetRange": {
+            "value": "[parameters('adSubnet')]"
+          },
+          "clientRootCertName": {
+            "value": "RootVpn"
+          },
+          "clientRootCertData": {
+            "value": "[parameters('vpnRootCertData')]"
+          },
+          "dnsPrefix": {
+            "value": "[parameters('dnsPrefix')]"
+          },
+          "appsSubnetName": {
+            "value": "[parameters('appsSubnetName')]"
+          },
+          "appsSubnetRange": {
+            "value": "[parameters('appsSubnet')]"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "[parameters('adPDCNicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/VNet"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[parameters('adPDCNicIPAddress')]",
+              "subnet": {
+                "id": "[variables('adSubnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('adBDCNicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/VNet"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[parameters('adBDCNicIPAddress')]",
+              "subnet": {
+                "id": "[variables('adSubnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('exchangeNicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/VNet"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[parameters('exchangeNicIPAddress')]",
+              "subnet": {
+                "id": "[variables('appsSubnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "name": "[parameters('adPDCVMName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts',parameters('StorageAccount'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces',parameters('adPDCNicName'))]",
+        "[resourceId('Microsoft.Compute/availabilitySets', parameters('adAvailabilitySetName'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('adVMSize')]"
+        },
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('adAvailabilitySetName'))]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('adPDCVMName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('StorageAccount')),providers('Microsoft.Storage','storageAccounts').apiVersions[0]).primaryEndpoints.blob,'vhds0/','osdisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "vhd": {
+                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('StorageAccount')),providers('Microsoft.Storage','storageAccounts').apiVersions[0]).primaryEndpoints.blob,'vhds0/', variables('adPDCDataDisk'),'-1.vhd')]"
+              },
+              "name": "[concat(parameters('adPDCVMName'),'-data-disk1')]",
+              "caching": "None",
+              "diskSizeGB": "[variables('adDataDiskSize')]",
+              "lun": 0,
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('adPDCNicName'))]"
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "name": "[concat(parameters('adPDCVMName'),'/CreateADForest')]",
+          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "apiVersion": "2015-06-15",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Compute/virtualMachines', parameters('adPDCVMName'))]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "2.21",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "modulesUrl": "[variables('adPDCModulesURL')]",
+              "configurationFunction": "[variables('adPDCConfigurationFunction')]",
+              "Properties": {
+                "DomainName": "[parameters('domainName')]",
+                "AdminCreds": {
+                  "UserName": "[parameters('adminUserName')]",
+                  "Password": "PrivateSettingsRef:AdminPassword"
+                }
+              }
+            },
+            "protectedSettings": {
+              "Items": {
+                "AdminPassword": "[parameters('adminPassword')]"
+              }
+            }
+          }
+        },
+        {
+          "name": "[concat(parameters('adPDCVMName'),'/BgInfo')]",
+          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('adPDCVMName'))]",
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('adPDCVMName'), '/extensions/CreateADForest')]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "BGInfo",
+            "typeHandlerVersion": "2.1",
+            "settings": {
+              "properties": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "UpdateVNetDNS1",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('adPDCVMName'),'/extensions/CreateADForest')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('vnetwithDNSTemplateUri')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "virtualNetworkName": {
+            "value": "[parameters('virtualNetworkName')]"
+          },
+          "virtualNetworkAddressRange": {
+            "value": "[parameters('virtualNetworkAddressRange')]"
+          },
+          "subnetName": {
+            "value": "[parameters('adSubnetName')]"
+          },
+          "subnetRange": {
+            "value": "[parameters('adSubnet')]"
+          },
+          "DNSServerAddress": {
+            "value": [
+              "[parameters('adPDCNicIPAddress')]"
+            ]
+          },
+          "appsSubnetName": {
+            "value": "[parameters('appsSubnetName')]"
+          },
+          "appsSubnetRange": {
+            "value": "[parameters('appsSubnet')]"
+
+          }
+        }
+      }
+    },
+    {
+      "name": "UpdateBDCNIC",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkInterfaces/',parameters('adBDCNicName'))]",
+        "Microsoft.Resources/deployments/UpdateVNetDNS1"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('nicTemplateUri')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "nicName": {
+            "value": "[parameters('adBDCNicName')]"
+          },
+          "ipConfigurations": {
+            "value": [
+              {
+                "name": "ipconfig1",
+                "properties": {
+                  "privateIPAllocationMethod": "Static",
+                  "privateIPAddress": "[parameters('adBDCNicIPAddress')]",
+                  "subnet": {
+                    "id": "[variables('adSubnetRef')]"
+                  }
+                }
+              }
+            ]
+          },
+          "dnsServers": {
+            "value": [
+              "[parameters('adPDCNicIPAddress')]"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "UpdateExchangeNIC",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkInterfaces/',parameters('exchangeNicName'))]",
+        "Microsoft.Resources/deployments/UpdateVNetDNS1"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('nicTemplateUri')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "nicName": {
+            "value": "[parameters('exchangeNicName')]"
+          },
+          "ipConfigurations": {
+            "value": [
+              {
+                "name": "ipconfig1",
+                "properties": {
+                  "privateIPAllocationMethod": "Static",
+                  "privateIPAddress": "[parameters('exchangeNicIPAddress')]",
+                  "subnet": {
+                    "id": "[variables('appsSubnetRef')]"
+                  }
+                }
+              }
+            ]
+          },
+          "dnsServers": {
+            "value": [
+              "[parameters('adPDCNicIPAddress')]"
+            ]
+          }
+        }
+      }
+    },
+
+    {
+      "name": "[parameters('adBDCVMName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts',parameters('StorageAccount'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces',parameters('adBDCNicName'))]",
+        "[resourceId('Microsoft.Compute/availabilitySets', parameters('adAvailabilitySetName'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('adVMSize')]"
+        },
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('adAvailabilitySetName'))]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('adBDCVMName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('StorageAccount')),providers('Microsoft.Storage','storageAccounts').apiVersions[0]).primaryEndpoints.blob,'vhds1/','osdisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "vhd": {
+                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('StorageAccount')),providers('Microsoft.Storage','storageAccounts').apiVersions[0]).primaryEndpoints.blob,'vhds1/', variables('adBDCDataDisk'),'-1.vhd')]"
+              },
+              "name": "[concat(parameters('adBDCVMName'),'-data-disk1')]",
+              "caching": "None",
+              "diskSizeGB": "[variables('adDataDiskSize')]",
+              "lun": 0,
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('adBDCNicName'))]"
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "name": "[concat(parameters('adBDCVMName'),'/PrepareBackupDC')]",
+          "apiVersion": "2015-06-15",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('adBDCVMName'))]",
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('adPDCVMName'),'/extensions/','CreateADForest')]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "2.21",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "modulesUrl": "[variables('adBDCPreparationModulesURL')]",
+              "configurationFunction": "[variables('adBDCPreparationFunction')]",
+              "Properties": {
+                "DNSServer": "[parameters('adPDCNicIPAddress')]"
+              }
+            },
+            "protectedSettings": {}
+          }
+        },
+        {
+          "name": "[concat(parameters('adBDCVMName'),'/BgInfo')]",
+          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('adBDCVMName'))]",
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('adBDCVMName'), '/extensions/PrepareBackupDC')]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "BGInfo",
+            "typeHandlerVersion": "2.1",
+            "settings": {
+              "properties": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "ConfiguringBackupADDomainController",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/',parameters('adBDCVMName'),'/extensions/PrepareBackupDC')]",
+        "Microsoft.Resources/deployments/UpdateBDCNIC"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('configureADBDCTemplateUri')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adBDCVMName": {
+            "value": "[parameters('adBDCVMName')]"
+          },
+          "location": {
+            "value": "[resourceGroup().location]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "domainName": {
+            "value": "[parameters('domainName')]"
+          },
+          "adBDCConfigurationFunction": {
+            "value": "[variables('adBDCConfigurationFunction')]"
+          },
+          "adBDCConfigurationModulesURL": {
+            "value": "[variables('adBDCConfigurationModulesURL')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "UpdateVNetDNS2",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/ConfiguringBackupADDomainController"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('vnetwithDNSTemplateUri')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "virtualNetworkName": {
+            "value": "[parameters('virtualNetworkName')]"
+          },
+          "virtualNetworkAddressRange": {
+            "value": "[parameters('virtualNetworkAddressRange')]"
+          },
+          "subnetName": {
+            "value": "[parameters('adSubnetName')]"
+          },
+          "subnetRange": {
+            "value": "[parameters('adSubnet')]"
+          },
+          "DNSServerAddress": {
+            "value": [
+              "[parameters('adPDCNicIPAddress')]",
+              "[parameters('adBDCNicIPAddress')]"
+            ]
+          },
+          "appsSubnetName": {
+            "value": "[parameters('appsSubnetName')]"
+          },
+          "appsSubnetRange": {
+            "value": "[parameters('appsSubnet')]"
+
+          }
+        }
+      }
+    },
+    {
+      "name": "[parameters('exchangeVmName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/UpdateVNetDNS1",
+        "[resourceId('Microsoft.Network/networkInterfaces',parameters('exchangeNicName'))]",
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('adBDCVMName'))]",
+        "[resourceId('Microsoft.Compute/availabilitySets', parameters('appsAvailabilitySetName'))]"
+      ],
+      "tags": {
+        "displayName": "Exchange"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('appsVMSize')]"
+        },
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('appsAvailabilitySetName'))]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('exchangeVmName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[parameters('imagePublisher')]",
+            "offer": "[parameters('imageOffer')]",
+            "sku": "[parameters('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "exchangeOSDisk",
+            "vhd": {
+              "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('StorageAccount')),providers('Microsoft.Storage','storageAccounts').apiVersions[0]).primaryEndpoints.blob,'vhds2/', variables('exchangeOSDiskName'),'-1.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "vhd": {
+                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('StorageAccount')),providers('Microsoft.Storage','storageAccounts').apiVersions[0]).primaryEndpoints.blob,'vhds2/', variables('exchangeDataDisk'),'-1.vhd')]"
+              },
+              "name": "[concat(parameters('exchangeVmName'),'-data-disk1')]",
+              "caching": "None",
+              "diskSizeGB": "[variables('dataDiskSize')]",
+              "lun": 0,
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('exchangeNicName'))]"
+            }
+          ]
+        }
+      },
+      "resources": [
+        {
+          "name": "[concat(parameters('exchangeVMName'),'/PrepareExchange')]",
+          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "apiVersion": "2015-06-15",
+          "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('exchangeVMName'))]",
+            "Microsoft.Resources/deployments/UpdateExchangeNIC"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Powershell",
+            "type": "DSC",
+            "typeHandlerVersion": "2.21",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "modulesUrl": "[variables('exchangeConfigurationModulesURL')]",
+              "configurationFunction": "[variables('exchangeConfigurationFunction')]",
+              "Properties": {
+                "DomainName": "[parameters('domainName')]",
+                "DnsServerIpAddress": "[parameters('adPDCNicIPAddress')]",
+                "StorageSize": "[parameters('exchangeStorageSizeInGB')]",
+                "ExchangeLink": "[parameters('exchangeISOUri')]",
+                "VMAdminCreds": {
+                  "userName": "[parameters('adminUsername')]",
+                  "password": "PrivateSettingsRef:adminPassword"
+                }
+              }
+            },
+            "protectedSettings": {
+              "items": {
+                "adminPassword": "[parameters('adminPassword')]"
+              },
+              "DataBlobUri": "[concat(parameters('_artifactsLocation'),'/DSC/ExchangeWorkload.psd1', parameters('_artifactsLocationSasToken'))]"
+            }
+          }
+        },
+        {
+          "name": "[concat(parameters('exchangeVMName'),'/BgInfo')]",
+          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('exchangeVMName'))]",
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('exchangeVMName'), '/extensions/PrepareExchange')]",
+            "Microsoft.Resources/deployments/UpdateExchangeNIC"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "BGInfo",
+            "typeHandlerVersion": "2.1",
+            "settings": {
+              "properties": []
+            }
+          }
+        }
+      ]
+
+    },
+    {
+      "name": "SqlServer",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/UpdateVNetDNS1",
+        "[resourceId('Microsoft.Compute/availabilitySets',parameters('appsAvailabilitySetName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('sqlVmTemplateUri')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "storageAccount": {
+            "value": "[parameters('sqlStorageAccount')]"
+          },
+          "storageAccountType": {
+            "value": "[parameters('storageAccountType')]"
+          },
+          "subnetResourceId": {
+            "value": "[variables('appsSubnetRef')]"
+          },
+          "domainName": {
+            "value": "[parameters('domainName')]"
+          },
+          "vmName": {
+            "value": "[parameters('sqlVmName')]"
+          },
+          "vmSize": {
+            "value": "[parameters('sqlVMSize')]"
+          },
+          "sqlNICName": {
+            "value": "[parameters('sqlNicName')]"
+          },
+          "sqlInstallationISOUri": {
+            "value": "[parameters('sqlServerIsoUrl')]"
+          },
+          "sqlServerServiceAccountUserName": {
+            "value": "[parameters('sqlServerServiceAccountUserName')]"
+          },
+          "sqlServerServiceAccountPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "primaryAdIpAddress": {
+            "value": "[parameters('adPDCNicIPAddress')]"
+          },
+          "availabilitySet": {
+            "value": "[parameters('appsAvailabilitySetName')]"
+          },
+          "_artifactsLocation": {
+            "value": "[parameters('_artifactsLocation')]"
+          },
+          "_artifactsLocationSasToken": {
+            "value": "[parameters('_artifactsLocationSasToken')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "Sharepoint",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/SqlServer"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('sharepointTemplateUri')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUserName": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "vmName": {
+            "value": "[parameters('sharePointVMName')]"
+          },
+          "vmSize": {
+            "value": "[parameters('appsVMSize')]"
+          },
+          "diskSize": {
+            "value": "[variables('dataDiskSize')]"
+          },
+          "domainName": {
+            "value": "[parameters('domainName')]"
+          },
+          "storageAccount": {
+            "value": "[parameters('StorageAccount')]"
+          },
+          "storageAccountType": {
+            "value": "[parameters('storageAccountType')]"
+          },
+          "subnetResourceId": {
+            "value": "[variables('appsSubnetRef')]"
+          },
+          "nicName": {
+            "value": "[parameters('sharePointNicName')]"
+          },
+          "primaryAdIpAddress": {
+            "value": "[parameters('adPDCNicIPAddress')]"
+          },
+          "sharePointIPAddress": {
+            "value": "[parameters('sharePointIPAddress')]"
+          },
+          "sharepointPublicIpDnsName": {
+            "value": "[parameters('sharepointPublicIpDnsName')]"
+          },
+          "sharePointSetupUserAccountUserName": {
+            "value": "[parameters('sharepointSetupUsername')]"
+          },
+          "sharePointSetupUserAccountPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "sharePointFarmAccountUserName": {
+            "value": "[parameters('sharePointFarmUsername')]"
+          },
+          "sharePointFarmAccountPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "sharePointFarmPassphrasePassword": {
+            "value": "[variables('sharePointFarmPassphrasePassword')]"
+          },
+          "DatabaseName": {
+            "value": "[variables('spcontentDatabaseName')]"
+          },
+          "sqlVMName": {
+            "value": "[parameters('sqlVMName')]"
+          },
+          "fqdn": {
+            "value": "[variables('spFQDN')]"
+          },
+          "sharepointInstallSourceDrive": {
+            "value": "F:"
+          },
+          "sharepointInstallSourceFolder": {
+            "value": "SharePoint2016"
+          },
+          "ProductKey": {
+            "value": "[parameters('sharepoint2016ProductKey')]"
+          },
+          "installationISOUri": {
+            "value": "[parameters('sharepoint2016Iso')]"
+          },
+          "_artifactsLocation": {
+            "value": "[parameters('_artifactsLocation')]"
+          },
+          "_artifactsLocationSasToken": {
+            "value": "[parameters('_artifactsLocationSasToken')]"
+          }
+        }
+      }
+    }
+  ]
+}

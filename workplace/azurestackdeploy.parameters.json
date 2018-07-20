@@ -1,0 +1,52 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "value": "azureuser"
+    },
+    "adminPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/14bbbdfe-3992-46e7-9a9e-65aae95e071a/resourceGroups/deployment/providers/Microsoft.KeyVault/vaults/mgcKeyVault"
+        },
+        "secretName": "password"
+      }
+    },
+    "sharepoint2016ProductKey": {
+      "value": "x"
+    },
+    "vpnRootCertData": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/14bbbdfe-3992-46e7-9a9e-65aae95e071a/resourceGroups/deployment/providers/Microsoft.KeyVault/vaults/mgcKeyVault"
+        },
+        "secretName": "password"
+      }
+    },
+    "storageAccountType": {
+      "value": "Premium_LRS"
+    },
+    "exchangeISOUri": {
+      "value": ""
+    },
+    "sharepoint2016Iso": {
+      "value": ""
+    },
+    "sharepointPublicIpDnsName": {
+      "value": "mgcsharepoint2"
+    },
+    "StorageAccount": {
+      "value": "mgcstore2"
+    },
+    "sqlStorageAccount": {
+      "value": "mgcsql2"
+    },
+    "virtualNetworkName": {
+      "value": "adVNET"
+    },
+    "appsVMSize": {
+      "value": "Standard_DS3_v2"
+    }
+  }
+}

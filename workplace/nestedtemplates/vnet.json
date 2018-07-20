@@ -1,0 +1,150 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualNetworkName": {
+      "type": "string",
+      "metadata": {
+        "Description": "The name of the Virtual Network to Create"
+      }
+    },
+    "virtualNetworkAddressRange": {
+      "type": "string",
+      "metadata": {
+        "Description": "The address range of the new VNET in CIDR format"
+      },
+      "defaultValue": "10.0.0.0/16"
+    },
+    "subnetName": {
+      "type": "string",
+      "metadata": {
+        "Description": "The name of the subnet created in the new VNET"
+      }
+    },
+    "subnetRange": {
+      "type": "string",
+      "metadata": {
+        "Description": "The address range of the subnet created in the new VNET"
+      },
+      "defaultValue": "14.1.1.0/24"
+    },
+    "appsSubnetName": {
+      "type": "string",
+      "metadata": {
+        "Description": "The name of the subnet created in the new VNET"
+      }
+    },
+    "appsSubnetRange": {
+      "type": "string",
+      "metadata": {
+        "Description": "The address range of the subnet created in the new VNET"
+      },
+      "defaultValue": "14.1.2.0/24"
+    },
+    "gatewaySubnetPrefix": {
+      "type": "string",
+      "metadata": {
+        "Description": "The address range of the gateway subnet"
+      },
+      "defaultValue": "14.1.99.0/24"
+    },
+    "vpnClientAddressPoolPrefix": {
+      "type": "string",
+      "metadata": {
+        "Description": "The Azure Region"
+      },
+      "defaultValue": "15.100.1.0/24"
+    },
+    "clientRootCertName": {
+      "type": "string",
+      "metadata": {
+        "Description": "The name of the certificate uploaded to Azure"
+      }
+    },
+    "clientRootCertData": {
+      "type": "securestring",
+      "metadata": {
+        "Description": "The encoded certificate"
+      }
+    },
+    "environmentPrefix": {
+      "type": "string",
+      "metadata": {
+        "Description": "The abbreviation of the environment as a prefix"
+      },
+      "defaultValue": "Test"
+    },
+    "publicIPAddressType": {
+      "type": "string",
+      "allowedValues": [
+        "Dynamic",
+        "Static"
+      ],
+      "metadata": {
+        "description": "The type of the public IP address used by a NIC"
+      },
+      "defaultValue": "Dynamic"
+    },
+    "dnsPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "The DNS prefix for the public IP address used by a NIC"
+      }
+    }
+  },
+  "variables": {
+    "gatewayName": "[concat(parameters('environmentPrefix'),'Gateway')]",
+    "gatewaySku": "Basic",
+    "gatewaySubnetRef": "[concat(variables('vnetID'),'/subnets/','GatewaySubnet')]",
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]"
+
+  },
+  "resources": [
+    {
+      "name": "mgcPubIp",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publicIPAllocationMethod": "[parameters('publicIPAddressType')]",
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('dnsPrefix')]"
+        }
+      }
+    },
+    {
+      "name": "[parameters('virtualNetworkName')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('virtualNetworkAddressRange')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "GatewaySubnet",
+            "properties": {
+              "addressPrefix": "[parameters('gatewaySubnetPrefix')]"
+            }
+          },
+          {
+            "name": "[parameters('subnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnetRange')]"
+            }
+          },
+          {
+            "name": "[parameters('appsSubnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('appsSubnetRange')]"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+
