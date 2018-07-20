@@ -1,6 +1,6 @@
 # workplace
 
-This project brings together several Azure Quickstart Templates to demonstrate deploying and configuring domain controllers, SQL Server, SharePoint Server and Exchange Server to Azure.
+This project brings together several Azure Quickstart Templates to demonstrate deploying and configuring domain controllers, SQL Server, SharePoint Server and Exchange Server to Azure. This was originally built as an example for deploying to Azure Stack (which is why there are no Managed Disks).
 
 To be able to deploy this yourself you need to do the following:
 
