@@ -32,7 +32,7 @@
       "metadata": {
         "description": "The name of the Virtual Network to Create"
       },
-      "defaultValue": "adVNET"
+      "defaultValue": "workplaceVnet"
     },
     "virtualNetworkAddressRange": {
       "type": "string",
@@ -53,7 +53,7 @@
       "metadata": {
         "description": "The address range of the subnet created in the new VNET"
       },
-      "defaultValue": "14.1.1.0/24"
+      "defaultValue": "10.14.1.0/24"
     },
     "appsSubnetName": {
       "type": "string",
@@ -67,7 +67,7 @@
       "metadata": {
         "description": "The address range of the subnet created in the new VNET"
       },
-      "defaultValue": "14.1.2.0/24"
+      "defaultValue": "10.14.2.0/24"
     },
 
     "adPDCNicName": {
@@ -82,7 +82,7 @@
       "metadata": {
         "description": "The IP address of the new AD Primary DC"
       },
-      "defaultValue": "14.1.1.4"
+      "defaultValue": "10.14.1.4"
     },
     "adBDCNicName": {
       "type": "string",
@@ -96,7 +96,7 @@
       "metadata": {
         "description": "The IP address of the new AD BDC"
       },
-      "defaultValue": "14.1.1.5"
+      "defaultValue": "10.14.1.5"
     },
     "exchangeNicName": {
       "type": "string",
@@ -110,7 +110,7 @@
       "metadata": {
         "description": "The IP address of the new AD BDC"
       },
-      "defaultValue": "14.1.2.250"
+      "defaultValue": "10.14.2.250"
     },
     "exchangeStorageSizeInGB": {
       "type": "int",
@@ -131,7 +131,7 @@
       "metadata": {
         "description": "The IP address of the SQL "
       },
-      "defaultValue": "14.1.2.245"
+      "defaultValue": "10.14.2.245"
     },
     "sqlServerServiceAccountUserName": {
       "type": "string",
@@ -166,7 +166,7 @@
       "metadata": {
         "description": "The IP address of the Share Point server"
       },
-      "defaultValue": "14.1.2.240"
+      "defaultValue": "10.14.2.240"
     },
     "adPDCVMName": {
       "type": "string",

@@ -1,9 +1,9 @@
-$workplacerg = 'mgc'
+$workplacerg = 'workplace'
 
 $paramHash = 
 @{ 
     DomainName = "cowen.me"
-	primaryAdIpAddress = "14.1.1.4"
+	primaryAdIpAddress = "10.14.1.4"
     AdminCreds = (Get-Credential -Message "Domain Admin user" -UserName "azureuser")
 	SharePointSetupUserAccountcreds = (Get-Credential -Message "Sharepoint Setup creds" -UserName "SpSetup")
 	SharePointFarmAccountcreds = (Get-Credential -Message "Sharepoint Farm creds" -UserName "SpFarm")
@@ -12,8 +12,8 @@ $paramHash =
 	DatabaseServer = "sql"
 	InstallSourceDrive = "F:"
 	InstallSourceFolderName = "installer" # ignored atm
-	ProductKey = Read-Host 'What is your SharePoint product key?'
-	SPDLLink = Read-Host 'What is your ISO url?'
+	ProductKey = 'x'
+	SPDLLink = 'x'
 }
 
 # publish the configuration with resources"
@@ -22,5 +22,5 @@ Publish-AzureRmVMDscConfiguration -ConfigurationPath "..\DSC\PrepareSharePoint.p
 
 
 Set-AzureRmVMDscExtension -Name PrepareSharepoint -ArchiveBlobName PrepareSharePoint.ps1.zip -ArchiveStorageAccountName mgcdeployment `
-    -ArchiveContainerName dsctesting -ArchiveResourceGroupName 'CowenRg' -ResourceGroupName $workplacerg -Version 2.21 -VMName sharePoint `
+    -ArchiveContainerName dsctesting -ArchiveResourceGroupName 'CowenRg' -ResourceGroupName $workplacerg -Version 2.76 -AutoUpdate -VMName sharePoint `
 	-ConfigurationArgument $paramHash -ConfigurationName PrepareSharepoint

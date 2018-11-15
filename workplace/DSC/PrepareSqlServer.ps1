@@ -1,7 +1,3 @@
-#
-# Copyright="?Microsoft Corporation. All rights reserved."
-#
-
 configuration PrepareSqlServer
 {
     param
@@ -9,7 +5,7 @@ configuration PrepareSqlServer
         [Parameter(Mandatory)]
         [String]$DomainName,
         
-        [String]$primaryAdIpAddress = "14.1.1.4",
+        [String]$primaryAdIpAddress,
 
         [Parameter(Mandatory)]
         [System.Management.Automation.PSCredential]$Admincreds,
@@ -30,8 +26,8 @@ configuration PrepareSqlServer
 		[ValidateNotNullorEmpty()] 
 		[String]$SystemTimeZone="GMT Standard Time",
         
-        [Int]$RetryCount=200,
-        [Int]$RetryIntervalSec=30
+        [Int]$RetryCount=10,
+        [Int]$RetryIntervalSec=5
     )
 
     Import-DscResource -ModuleName ComputerManagementDsc,xActiveDirectory,StorageDsc, SqlServerDsc, NetworkingDsc, FileDownloadDsc, xDownloadISO
@@ -41,12 +37,6 @@ configuration PrepareSqlServer
     [System.Management.Automation.PSCredential]$SPSCreds = New-Object System.Management.Automation.PSCredential ("${DomainNetbiosName}\$($SharePointSetupUserAccountcreds.UserName)", $SharePointSetupUserAccountcreds.Password)
     [System.Management.Automation.PSCredential]$SQLCreds = New-Object System.Management.Automation.PSCredential ("${DomainNetbiosName}\$($SQLServicecreds.UserName)", $SQLServicecreds.Password)
 
-    Install-WindowsFeature -Name RSAT-DNS-Server
-    $currentDNS = (Get-DnsClientServerAddress -InterfaceAlias Ethernet -Family IPv4).ServerAddresses
-    $newdns = @($primaryAdIpAddress) + $currentDNS
-    Set-DnsClientServerAddress -InterfaceAlias Ethernet -ServerAddresses $currentDNS
-    ipconfig /flushdns
-	# Get the disk number of the data disks (expecting 2 disks)
 	
 	$dataDisks = Get-Disk | where{$_.PartitionStyle -eq "RAW"}
 	$dataDiskNumberOne = $dataDisks[0].Number
@@ -126,18 +116,18 @@ configuration PrepareSqlServer
 
         xDownloadISO Download
         {
-            SourcePath = $sqlInstallationISOUri
+            SourcePath               = $sqlInstallationISOUri
             DestinationDirectoryPath = "C:\SQL2016"
-            DependsOn = '[WindowsFeature]DotNet45'
+            DependsOn                = '[WindowsFeature]DotNet45'
         }
 
         xWaitForADDomain DscForestWait 
         { 
-            DomainName = $DomainName 
-            DomainUserCredential= $DomainCreds
-            RetryCount = $RetryCount 
-            RetryIntervalSec = $RetryIntervalSec 
-            DependsOn = '[xDownloadISO]Download'
+            DomainName           = $DomainName 
+            DomainUserCredential = $DomainCreds
+            RetryCount           = $RetryCount 
+            RetryIntervalSec     = $RetryIntervalSec 
+            DependsOn            = '[xDownloadISO]Download'
         }
 
         Computer DomainJoin
@@ -198,6 +188,14 @@ configuration PrepareSqlServer
             SQLUserDBLogDir = "G:\SQL\Log"
             DependsOn = '[xADUser]CreateSqlServerServiceAccount'
         }
+
+		SqlServerMaxDop SetMaxDop
+        {
+            InstanceName = "MSSQLSERVER"
+            MaxDop = 1
+			Ensure = 'Present'
+            DependsOn = "[SqlSetup]InstallSqlServer"
+        }
 		
 		SqlServerNetwork SetNetwork
 		{
@@ -211,11 +209,11 @@ configuration PrepareSqlServer
 		
         SqlWindowsFirewall Create_FirewallRules_For_SQL2016
         {
-            Ensure           = 'Present'
-            Features         = 'SQLENGINE'
-            InstanceName     = 'MSSQLSERVER'
-            SourcePath       = 'C:\SQL2016'
-            DependsOn = '[SqlServerNetwork]SetNetwork'
+            Ensure        = 'Present'
+            Features      = 'SQLENGINE'
+            InstanceName  = 'MSSQLSERVER'
+            SourcePath    = 'C:\SQL2016'
+            DependsOn     = '[SqlServerNetwork]SetNetwork'
         }
 		
 		#SSMS is no longer included with SQL Server
@@ -253,7 +251,6 @@ configuration PrepareSqlServer
 
 		SqlServerLogin AddDomainAdminAccountToSysadminServerRole
         {
-			#ServerName = "sql.$DomainName"
 			ServerName = "localhost"
 			InstanceName = "MSSQLSERVER"
             Name = $DomainCreds.UserName
@@ -321,7 +318,7 @@ function Get-NetBIOSName
 }
 
 function WaitForSqlSetup
-{14.1.1
+{
     # Wait for SQL Server Setup to finish before proceeding.
     while ($true)
     {

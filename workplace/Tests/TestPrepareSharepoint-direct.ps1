@@ -17,8 +17,8 @@ $configData =@{
 $paramHash = 
 @{ 
     configurationData = $configData
-    DomainName = "mgc.local"
-	primaryAdIpAddress = "14.1.1.4"
+    DomainName = "cowen.me"
+	primaryAdIpAddress = "10.14.1.4"
     AdminCreds = (Get-Credential -Message "Domain Admin user" -UserName "azureuser")
 	SharePointSetupUserAccountcreds = (Get-Credential -Message "Sharepoint Setup creds" -UserName "SpSetup")
 	SharePointFarmAccountcreds = (Get-Credential -Message "Sharepoint Farm creds" -UserName "SpFarm")

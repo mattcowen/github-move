@@ -35,7 +35,17 @@
 
     Import-DscResource -ModuleName  StorageDsc, NetworkingDsc, ComputerManagementDsc, PSDesiredStateConfiguration, FileDownloadDSC, xExchange, xPendingReboot, xDownloadISO
     
+	<#
+	I had to add the following registry key to prevent Hybrid Detection during setup. i
+	think this was caused by my AAD being linked at some point to a demo office 365 env.
 
+	## TODO: add the following registry key to disable Hybrid Detection during setup
+	Path:  HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\ExchangeServer\v15\Setup
+	Type: REG_SZ
+	Name: RunHybridDetection
+	Value: 1  
+
+	#>
 
 	# Downloaded file storage location
 	$exchangeInstallerPath = "$env:SystemDrive\Exchange";
@@ -93,10 +103,36 @@
             Ensure = "Present"
 			DependsOn = "[Computer]JoinDomain"
 		}
+		WindowsFeature WebAspNet45 {
+			Name = "Web-Asp-Net45"
+            Ensure = "Present"
+			DependsOn = "[WindowsFeature]Net45Features"
+		}
+		
+		FileDownload DownloadDotNetFx471
+		{
+			Url = "http://go.microsoft.com/fwlink/?linkid=863262"
+			FileName = "$env:SystemDrive\dotnet.exe"
+			DependsOn = "[WindowsFeature]Net45Features"
+		}
+
+		Script dotNet471 {
+            GetScript = { }
+            SetScript = {
+                Start-Process -FilePath "$env:SystemDrive\dotnet.exe" -ArgumentList '/q' -Wait
+            }
+            TestScript = {
+                Get-ChildItem 'HKLM:SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\' |
+                    Get-ItemPropertyValue -Name Release |
+                        ForEach-Object {$_ -ge 461308}
+            }
+			DependsOn = "[FileDownload]DownloadDotNetFx471"
+        }
+
 		WindowsFeature RPCOverHTTPProxy {
 			Name = "RPC-over-HTTP-proxy"
             Ensure = "Present"
-			DependsOn = "[WindowsFeature]Net45Features"
+			DependsOn = "[Script]dotNet471"
 		}
 		WindowsFeature RSATClustering {
 			Name = "RSAT-Clustering"
@@ -123,15 +159,10 @@
             Ensure = "Present"
 			DependsOn = "[WindowsFeature]RSATClusteringPS"
 		}
-		WindowsFeature WebAspNet45 {
-			Name = "Web-Asp-Net45"
-            Ensure = "Present"
-			DependsOn = "[WindowsFeature]WASProcessModel"
-		}
 		WindowsFeature WebBasicAuth {
 			Name = "Web-Basic-Auth"
             Ensure = "Present"
-			DependsOn = "[WindowsFeature]WebAspNet45"
+			DependsOn = "[WindowsFeature]WASProcessModel"
 		}
 		WindowsFeature WebClientAuth {
 			Name = "Web-Client-Auth"
@@ -312,24 +343,26 @@
 			DependsOn = "[xDownloadISO]DownloadExchangeImage"
 		}
 
-		xExchInstall PrepADSchema
+		#xExchInstall PrepADSchema
+		#{
+		#	Path = "$exchangeInstallerPath\setup.exe"
+  #          Arguments = "/PrepareSchema /DomainController:adPDC.$DomainName /IAcceptExchangeServerLicenseTerms"
+  #          Credential = $DomainCreds
+  #          DependsOn = '[xDownloadISO]DownloadExchangeImage'
+
+		#}
+
+		# prepare AD will also prepare the schema
+		xExchInstall PrepAD
 		{
 			Path = "$exchangeInstallerPath\setup.exe"
-            Arguments = "/PrepareSchema /DomainController:adPDC.$DomainName /IAcceptExchangeServerLicenseTerms"
+            Arguments = "/PrepareAD /on:MCSC /DomainController:adPDC.$DomainName /IAcceptExchangeServerLicenseTerms"
             Credential = $DomainCreds
             DependsOn = '[xDownloadISO]DownloadExchangeImage'
 
 		}
 
-		#xExchInstall PrepAD
-		#{
-		#	Path = "$exchangeInstallerPath\setup.exe"
-  #          Arguments = "/PrepareAD /on:MCSC /DomainController:adPDC.$DomainName /IAcceptExchangeServerLicenseTerms"
-  #          Credential = $DomainCreds
-  #          DependsOn = '[xExchInstall]PrepADSchema'
-
-		#}
-
+		# we only have one domain so we don't need to prepare domains (it was done in PrepareAD)
 		#xExchInstall PrepADDomain
 		#{
 		#	Path = "$exchangeInstallerPath\setup.exe"
@@ -340,31 +373,24 @@
 
 		xExchWaitForADPrep WaitPrepAD
 		{
-			Identity = "not used"
-			Credential = $DomainCreds
+			Identity            = "not used"
+			Credential          = $DomainCreds
 			SchemaVersion       = 15330
             OrganizationVersion = 16213
             DomainVersion       = 13236
-            DependsOn = '[xExchInstall]PrepADDomain'
+            DependsOn           = '[xExchInstall]PrepAD'
 		}
         
 
 		## Install Exchange 2016 CU6
         xExchInstall InstallExchange
         {
-            Path = "$exchangeInstallerPath\setup.exe"
-            Arguments = "/Mode:Install /Role:Mailbox /OrganizationName:MCSC /TargetDir:F:\Exchange /IAcceptExchangeServerLicenseTerms"
-            Credential = $DomainCreds
+            Path         = "$exchangeInstallerPath\setup.exe"
+            Arguments    = "/Mode:Install /Role:Mailbox /OrganizationName:MCSC /TargetDir:F:\Exchange /IAcceptExchangeServerLicenseTerms"
+            Credential   = $DomainCreds
 			PsDscRunAsCredential = $DomainCreds
-            DependsOn = '[xExchWaitForADPrep]WaitPrepAD'
+            DependsOn    = '[xExchWaitForADPrep]WaitPrepAD'
         }
-
-
-		#xExchangeValidate ValidateExchange2016
-		#{
-		#	TestName = "All"
-		#	DependsOn = "[xInstaller]DeployExchangeCU1"
-		#}
 
 		
    }

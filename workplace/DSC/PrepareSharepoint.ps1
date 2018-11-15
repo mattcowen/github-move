@@ -42,8 +42,8 @@ Configuration PrepareSharepoint
 		[ValidateNotNullorEmpty()] 
 		[String]$SystemTimeZone="GMT Standard Time",
         
-        [Int]$RetryCount=30,
-        [Int]$RetryIntervalSec=60
+        [Int]$RetryCount=10,
+        [Int]$RetryIntervalSec=5
     )
 
 	Write-Verbose "AzureExtensionHandler loaded continuing with configuration"
@@ -216,6 +216,7 @@ Configuration PrepareSharepoint
 		SPInstallPrereqs InstallPrereqs {
             Ensure            = "Present"
             InstallerPath     = "F:\installer\prerequisiteinstaller.exe"
+			IsSingleInstance  = 'Yes'
             OnlineMode        = $true
 			DependsOn = '[xDownloadISO]DownloadSPImage'
 		}
@@ -223,6 +224,7 @@ Configuration PrepareSharepoint
 		SPInstall InstallSharePoint {
             Ensure = "Present"
             BinaryDir = "F:\installer\"
+			IsSingleInstance  = 'Yes'
             ProductKey = $ProductKey
             DependsOn = "[SPInstallPrereqs]InstallPrereqs"
 		}
@@ -238,6 +240,7 @@ Configuration PrepareSharepoint
         SPFarm CreateSPFarm
         {
             Ensure                   = "Present"
+			IsSingleInstance         = 'Yes'
             DatabaseServer           = "sql"
             AdminContentDatabaseName = "SP_AdminContent"
             FarmConfigDatabaseName   = "SP_Config"
@@ -256,7 +259,7 @@ Configuration PrepareSharepoint
             AccountName          = "SpServicePool"
             Account              = $ServicePoolManagedAccount
             PsDscRunAsCredential = $SPSetupAccount
-			Ensure   = "Present"
+			Ensure               = "Present"
             DependsOn            = "[SPFarm]CreateSPFarm"
 		}	
 		SPManagedAccount WebPoolManagedAccount
@@ -271,14 +274,15 @@ Configuration PrepareSharepoint
 		File CreateUsageLogs
 		{
 			DestinationPath = "F:\UsageLogs"
-			Ensure = 			 "Present"
-			Type = 			   "Directory"
+			Ensure = "Present"
+			Type = "Directory"
 			DependsOn = '[SPManagedAccount]WebPoolManagedAccount'
 		}
 
 		SPDiagnosticLoggingSettings ApplyDiagnosticLogSettings
         {
             PsDscRunAsCredential                        = $SPSetupAccount
+			IsSingleInstance                            = 'Yes'
             LogPath                                     = "F:\ULS"
             LogSpaceInGB                                = 5
             AppAnalyticsAutomaticUploadEnabled          = $false
@@ -342,7 +346,7 @@ Configuration PrepareSharepoint
             ApplicationPoolAccount = $WebPoolManagedAccount.UserName
             AllowAnonymous         = $false
             DatabaseName           = "SP_Content"
-            Url                    = "http://sites.$DomainName"
+            WebAppUrl              = "http://sites.$DomainName"
 			DatabaseServer         = "sql"
             Port                   = 80
             PsDscRunAsCredential   = $SPSetupAccount

@@ -39,7 +39,7 @@
       "metadata": {
         "Description": "The address range of the gateway subnet"
       },
-      "defaultValue": "14.1.99.0/24"
+      "defaultValue": "10.14.99.0/24"
     },
     "appsSubnetName": {
       "type": "string",
@@ -52,7 +52,7 @@
       "metadata": {
         "Description": "The address range of the subnet created in the new VNET"
       },
-      "defaultValue": "14.1.2.0/24"
+      "defaultValue": "10.14.2.0/24"
     }
 
   },
