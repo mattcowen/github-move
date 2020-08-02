@@ -35,17 +35,7 @@
 
     Import-DscResource -ModuleName  StorageDsc, NetworkingDsc, ComputerManagementDsc, PSDesiredStateConfiguration, FileDownloadDSC, xExchange, xPendingReboot, xDownloadISO
     
-	<#
-	I had to add the following registry key to prevent Hybrid Detection during setup. i
-	think this was caused by my AAD being linked at some point to a demo office 365 env.
-
-	## TODO: add the following registry key to disable Hybrid Detection during setup
-	Path:  HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\ExchangeServer\v15\Setup
-	Type: REG_SZ
-	Name: RunHybridDetection
-	Value: 1  
-
-	#>
+	
 
 	# Downloaded file storage location
 	$exchangeInstallerPath = "$env:SystemDrive\Exchange";
@@ -58,7 +48,8 @@
     {
         LocalConfigurationManager
         {
-            RebootNodeIfNeeded = $true
+			RebootNodeIfNeeded = $true;
+			ActionAfterReboot = "ContinueConfiguration";
         }
 		
 		TimeZone TimeZoneExample 
@@ -109,14 +100,14 @@
 			DependsOn = "[WindowsFeature]Net45Features"
 		}
 		
-		FileDownload DownloadDotNetFx471
+		FileDownload DownloadDotNetFx472
 		{
-			Url = "http://go.microsoft.com/fwlink/?linkid=863262"
+			Url = "http://go.microsoft.com/fwlink/?LinkId=863262"
 			FileName = "$env:SystemDrive\dotnet.exe"
 			DependsOn = "[WindowsFeature]Net45Features"
 		}
 
-		Script dotNet471 {
+		Script dotNet472 {
             GetScript = { }
             SetScript = {
                 Start-Process -FilePath "$env:SystemDrive\dotnet.exe" -ArgumentList '/q' -Wait
@@ -124,15 +115,41 @@
             TestScript = {
                 Get-ChildItem 'HKLM:SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\' |
                     Get-ItemPropertyValue -Name Release |
-                        ForEach-Object {$_ -ge 461308}
+                        ForEach-Object {$_ -ge 461814}
             }
-			DependsOn = "[FileDownload]DownloadDotNetFx471"
+			DependsOn = "[FileDownload]DownloadDotNetFx472"
+			}
+
+		<#
+		I had to add the following registry key to prevent Hybrid Detection during setup. I
+		think this was caused by my AAD being linked at some point to a demo office 365 env.
+
+		## TODO: add the following registry key to disable Hybrid Detection during setup
+		Path:  HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\ExchangeServer\v15\Setup
+		Type: REG_SZ
+		Name: RunHybridDetection
+		Value: 1  
+
+		#>
+		Script disableHybridDetectionRegKey {
+            GetScript = { }
+            SetScript = {
+				$registryPath = 'HKLM:SOFTWARE\Microsoft\ExchangeServer\v15\Setup\'
+				$name = 'RunHybridDetection'
+				$value = '1'
+                New-Item -Path $registryPath -Force | Out-Null
+				New-ItemProperty -Path $registryPath -Name $name -Value $value -PropertyType String -Force | Out-Null
+            }
+            TestScript = {
+                Test-Path 'HKLM:SOFTWARE\Microsoft\ExchangeServer\v15\Setup\'
+            }
+			DependsOn = "[Script]dotNet472"
         }
 
 		WindowsFeature RPCOverHTTPProxy {
 			Name = "RPC-over-HTTP-proxy"
             Ensure = "Present"
-			DependsOn = "[Script]dotNet471"
+			DependsOn = "[Script]disableHybridDetectionRegKey"
 		}
 		WindowsFeature RSATClustering {
 			Name = "RSAT-Clustering"
@@ -291,7 +308,7 @@
 			DependsOn = "[WindowsFeature]RsatAdds"
 		}
 
-		FileDownload DownloadUCMA4
+		FileDownload DownloadUnifiedCommsManager
 		{
 			Url = "https://download.microsoft.com/download/2/C/4/2C47A5C1-A1F3-4843-B9FE-84C0032C61EC/UcmaRuntimeSetup.exe"
 			FileName = "$env:SystemDrive\UcmaRuntimeSetup.exe"
@@ -307,7 +324,7 @@
 			Path = "$env:SystemDrive\UcmaRuntimeSetup.exe"
 			ProductId = '41D635FE-4F9D-47F7-8230-9B29D6D42D31'
 			Arguments = '-q' # args for silent mode
-			DependsOn = "[FileDownload]DownloadUCMA4"
+			DependsOn = "[FileDownload]DownloadUnifiedCommsManager"
 		}
 		
 		# Reboot node if necessary
@@ -319,14 +336,14 @@
 		
 		# if running again manually you may need to remove the directory 
 		# $exchangeInstallerPath otherwise the ISO isn't downloaded
-		#File SetupFolder
-		#{
-		#	Ensure = "Absent"
-		#	DestinationPath = $exchangeInstallerPath
-		#	Force = $true
-		#	Type = "Directory"
-		#   DependsOn = "[xPendingReboot]RebootPostInstallUCMA4"
-		#}
+		File SetupFolder
+		{
+			Ensure = "Absent"
+			DestinationPath = $exchangeInstallerPath
+			Force = $true
+			Type = "Directory"
+		   DependsOn = "[xPendingReboot]RebootPostInstallUCMA4"
+		}
 		
 		xDownloadISO DownloadExchangeImage
         {
@@ -343,41 +360,27 @@
 			DependsOn = "[xDownloadISO]DownloadExchangeImage"
 		}
 
-		#xExchInstall PrepADSchema
-		#{
-		#	Path = "$exchangeInstallerPath\setup.exe"
-  #          Arguments = "/PrepareSchema /DomainController:adPDC.$DomainName /IAcceptExchangeServerLicenseTerms"
-  #          Credential = $DomainCreds
-  #          DependsOn = '[xDownloadISO]DownloadExchangeImage'
-
-		#}
-
 		# prepare AD will also prepare the schema
+		# we only have one domain so we don't need to prepare domains (it was done in PrepareAD)
 		xExchInstall PrepAD
 		{
 			Path = "$exchangeInstallerPath\setup.exe"
-            Arguments = "/PrepareAD /on:MCSC /DomainController:adPDC.$DomainName /IAcceptExchangeServerLicenseTerms"
+            Arguments = "/PrepareAD /OrganizationName:MCSC /DomainController:adPDC.$DomainName /IAcceptExchangeServerLicenseTerms"
             Credential = $DomainCreds
             DependsOn = '[xDownloadISO]DownloadExchangeImage'
 
 		}
 
-		# we only have one domain so we don't need to prepare domains (it was done in PrepareAD)
-		#xExchInstall PrepADDomain
-		#{
-		#	Path = "$exchangeInstallerPath\setup.exe"
-  #          Arguments = "/PrepareDomain:$DomainName /DomainController:adPDC.$DomainName /IAcceptExchangeServerLicenseTerms"
-  #          Credential = $DomainCreds
-  #          DependsOn = '[xExchInstall]PrepAD'
-		#}
-
+		
+		# For version integers see 
+		# https://docs.microsoft.com/en-us/Exchange/plan-and-deploy/prepare-ad-and-domains?view=exchserver-2016#step-2-prepare-active-directory
 		xExchWaitForADPrep WaitPrepAD
 		{
 			Identity            = "not used"
 			Credential          = $DomainCreds
-			SchemaVersion       = 15330
-            OrganizationVersion = 16213
-            DomainVersion       = 13236
+			SchemaVersion       = 15332
+            OrganizationVersion = 16217
+            DomainVersion       = 13237
             DependsOn           = '[xExchInstall]PrepAD'
 		}
         

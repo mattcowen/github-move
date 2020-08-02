@@ -62,12 +62,6 @@
       },
       "defaultValue": 2
     },
-    "storageAccount": {
-      "type": "string",
-      "metadata": {
-        "description": "The Storage Account Name"
-      }
-    },
     "storageAccountType": {
       "type": "string",
       "metadata": {
@@ -187,14 +181,6 @@
   },
   "resources": [
     {
-      "name": "[parameters('storageAccount')]",
-      "type": "Microsoft.Storage/storageAccounts",
-      "location": "[variables('location')]",
-      "apiVersion": "2016-01-01",
-      "sku": { "name": "[parameters('storageAccountType')]" },
-      "kind": "Storage"
-    },
-    {
       "name": "[parameters('sharepointPublicIpName')]",
       "type": "Microsoft.Network/publicIPAddresses",
       "location": "[resourceGroup().location]",
@@ -244,7 +230,6 @@
       "location": "[resourceGroup().location]",
       "apiVersion": "2015-06-15",
       "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts',parameters('storageAccount'))]",
         "[resourceId('Microsoft.Network/networkInterfaces',parameters('nicName'))]"
       ],
       "properties": {
@@ -268,17 +253,11 @@
           },
           "osDisk": {
             "name": "osdisk",
-            "vhd": {
-              "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('storageAccount')),providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, variables('vmContainerName'),'/', parameters('vmName'), '0','-osdisk.vhd')]"
-            },
             "caching": "ReadWrite",
             "createOption": "FromImage"
           },
           "dataDisks": [
             {
-              "vhd": {
-                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('storageAccount')),providers('Microsoft.Storage','storageAccounts').apiVersions[0]).primaryEndpoints.blob, variables('vmContainerName'),'/',parameters('vmName'),'0','-data-1.vhd')]"
-              },
               "name": "[concat(parameters('vmName'), '0','data-1.vhd')]",
               "caching": "None",
               "createOption": "Empty",

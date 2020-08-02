@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "adminUsername": {
-      "value": "azureuser"
+      "value": "mcowen"
     },
     "adminPassword": {
       "reference": {
@@ -14,7 +14,12 @@
       }
     },
     "sharepoint2016ProductKey": {
-      "value": "TY6N4-K9WD3-JD2J2-VYKTJ-GVJ2J"
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/14bbbdfe-3992-46e7-9a9e-65aae95e071a/resourceGroups/deployment/providers/Microsoft.KeyVault/vaults/mgcKeyVault"
+        },
+        "secretName": "sharepointProductKey"
+      }
     },
     "vpnRootCertData": {
       "reference": {
@@ -28,13 +33,23 @@
       "value": "Premium_LRS"
     },
     "exchangeISOUri": {
-      "value": "https://download.microsoft.com/download/B/C/9/BC9C77DA-97D9-43D8-A3F8-50D8AF89E3FA/ExchangeServer2016-x64-cu10.iso"
+      "value": "https://download.microsoft.com/download/5/9/6/59681DAE-AB62-4854-8DEC-CA25FFEFE3B3/ExchangeServer2016-x64-cu13.iso"
     },
     "sharepoint2016Iso": {
-      "value": "https://mgcdeployment.blob.core.windows.net/public-iso/en_sharepoint_server_2016_x64_dvd_8419458.iso?st=2018-11-13T18%3A32%3A36Z&se=2018-11-21T18%3A32%3A00Z&sp=r&sv=2018-03-28&sr=b&sig=Bxym%2BrPr6HCjlbDcixw8uf5YCkQmlW5QXnMCHMvh7gY%3D"
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/14bbbdfe-3992-46e7-9a9e-65aae95e071a/resourceGroups/deployment/providers/Microsoft.KeyVault/vaults/mgcKeyVault"
+        },
+        "secretName": "sharepointIsoUrl"
+      }
     },
     "sqlServerIsoUrl": {
-      "value": "https://mgcdeployment.blob.core.windows.net/public-iso/en_sql_server_2016_developer_with_service_pack_1_x64_dvd_9548071.iso?st=2018-11-14T09%3A47%3A26Z&se=2018-11-21T09%3A47%3A00Z&sp=rl&sv=2018-03-28&sr=b&sig=4XZCedDcn8Z5yYBbok4FISc07lXPmSkc3%2BNKuss8pQo%3D"
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/14bbbdfe-3992-46e7-9a9e-65aae95e071a/resourceGroups/deployment/providers/Microsoft.KeyVault/vaults/mgcKeyVault"
+        },
+        "secretName": "sqlInstallIsoUrl"
+      }
     },
     "sharepointPublicIpDnsName": {
       "value": "mgcsharepoint1311"

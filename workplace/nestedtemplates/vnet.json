@@ -125,12 +125,6 @@
         },
         "subnets": [
           {
-            "name": "GatewaySubnet",
-            "properties": {
-              "addressPrefix": "[parameters('gatewaySubnetPrefix')]"
-            }
-          },
-          {
             "name": "[parameters('subnetName')]",
             "properties": {
               "addressPrefix": "[parameters('subnetRange')]"

@@ -1,7 +1,7 @@
 $paramHash = 
 @{ 
     DomainName = "cowen.me"
-    AdminCreds = (Get-Credential -Message "Domain Admin user" -UserName "azureuser")
+    AdminCreds = (Get-Credential -Message "Domain Admin user" -UserName "mcowen")
 	SQLServicecreds = (Get-Credential -Message "Sql service creds" -UserName "sqlservice")
     SharePointSetupUserAccountcreds = (Get-Credential -Message "Sharepoint Setup creds" -UserName "SpSetup")
     sqlInstallationISOUri = 'xx'

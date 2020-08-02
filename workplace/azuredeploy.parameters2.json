@@ -1,0 +1,98 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adBDCNicIPAddress": {
+      "value": "10.15.1.5"
+    },
+    "adminPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/14bbbdfe-3992-46e7-9a9e-65aae95e071a/resourceGroups/deployment/providers/Microsoft.KeyVault/vaults/mgcKeyVault"
+        },
+        "secretName": "password"
+      }
+    },
+    "adminUsername": {
+      "value": "mcowen"
+    },
+    "adPDCNicIPAddress": {
+      "value": "10.15.1.4"
+    },
+    "adSubnet": {
+      "value": "10.15.1.0/24"
+    },
+    "adVMSize": {
+      "value": "Standard_DS2_v2"
+    },
+    "appsSubnet": {
+      "value": "10.15.2.0/24"
+    },
+    "appsVMSize": {
+      "value": "Standard_DS3_v2"
+    },
+    "deploySharepoint": {
+      "value": "No"
+    },
+    "dnsPrefix": {
+      "value": "mgc2209"
+    },
+    "domainName": {
+      "value": "cowen.me"
+    },
+    "exchangeISOUri": {
+      "value": "https://download.microsoft.com/download/5/9/6/59681DAE-AB62-4854-8DEC-CA25FFEFE3B3/ExchangeServer2016-x64-cu13.iso"
+    },
+    "exchangeNicIPAddress": {
+      "value": "10.15.2.250"
+    },
+    "gatewaySubnetIpRange": {
+      "value": "10.15.99.0/24"
+    },
+    "sharepoint2016Iso": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/14bbbdfe-3992-46e7-9a9e-65aae95e071a/resourceGroups/deployment/providers/Microsoft.KeyVault/vaults/mgcKeyVault"
+        },
+        "secretName": "sharepointIsoUrl"
+      }
+    },
+    "sharepoint2016ProductKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/14bbbdfe-3992-46e7-9a9e-65aae95e071a/resourceGroups/deployment/providers/Microsoft.KeyVault/vaults/mgcKeyVault"
+        },
+        "secretName": "sharepointProductKey"
+      }
+    },
+    "sharepointPublicIpDnsName": {
+      "value": "mgcsharepoint2209"
+    },
+    "sqlServerIsoUrl": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/14bbbdfe-3992-46e7-9a9e-65aae95e071a/resourceGroups/deployment/providers/Microsoft.KeyVault/vaults/mgcKeyVault"
+        },
+        "secretName": "sqlInstallIsoUrl"
+      }
+    },
+    "sqlVMSize": {
+      "value": "Standard_DS3_v2"
+    },
+    "storageAccountType": {
+      "value": "Premium_LRS"
+    },
+    "virtualNetworkAddressRange": {
+      "value": "10.15.0.0/16"
+    },
+    "vpnRootCertData": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/14bbbdfe-3992-46e7-9a9e-65aae95e071a/resourceGroups/deployment/providers/Microsoft.KeyVault/vaults/mgcKeyVault"
+        },
+        "secretName": "password"
+      }
+    }
+  }
+}
+

@@ -23,6 +23,8 @@
   <Import Condition=" Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Deployment\1.1\DeploymentProject.targets') " Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Deployment\1.1\DeploymentProject.targets" />
   <!-- vertag<:>end -->
   <ItemGroup>
+    <Content Include="azuredeploy.parameters3.json" />
+    <Content Include="azuredeploy.parameters2.json" />
     <Content Include="azuredeploy.json" />
     <Content Include="azuredeploy.parameters.json" />
     <None Include="azuredeploy-sharepoint.json" />
@@ -46,6 +48,7 @@
     <Content Include="nestedtemplates\vnet-with-dns-server.json" />
     <Content Include="nestedtemplates\vnet-with-vpn.json" />
     <Content Include="nestedtemplates\vnet.json" />
+    <None Include="DeployScript.ps1" />
     <None Include="Tests\TestConfigureADBDC.ps1" />
     <None Include="Tests\TestPrepareExchange-direct.ps1" />
     <None Include="Tests\TestPrepareExchange.ps1" />
@@ -53,6 +56,7 @@
     <None Include="Tests\TestPrepareSharepoint-invoke.ps1" />
     <None Include="Tests\TestPrepareSharepoint.ps1" />
     <None Include="Tests\TestPrepareSqlServer.ps1" />
+    <None Include="Useful\diag.ps1" />
     <None Include="Useful\InstallModulesLocally.ps1" />
     <None Include="Useful\LCMConfig.ps1" />
     <None Include="Useful\SettingLCMconfig.ps1" />

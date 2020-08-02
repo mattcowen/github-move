@@ -43,12 +43,6 @@
         "description": "The VM Name"
       }
     },
-    "storageAccount": {
-      "type": "string",
-      "metadata": {
-        "description": "The Storage Account Name"
-      }
-    },
     "storageAccountType": {
       "type": "string",
       "metadata": {
@@ -146,14 +140,7 @@
     "deploySqlStandaloneConfigurationFunction": "PrepareSqlServer.ps1\\PrepareSqlServer"
   },
   "resources": [
-    {
-      "name": "[parameters('storageAccount')]",
-      "type": "Microsoft.Storage/storageAccounts",
-      "location": "[variables('location')]",
-      "apiVersion": "2016-01-01",
-      "sku": { "name": "[parameters('storageAccountType')]" },
-      "kind": "Storage"
-    },
+    
     {
       "name": "[parameters('sqlNicName')]",
       "type": "Microsoft.Network/networkInterfaces",
@@ -179,7 +166,7 @@
       "location": "[variables('location')]",
       "apiVersion": "2015-06-15",
       "dependsOn": [
-        "[resourceId('Microsoft.Storage/storageAccounts',parameters('storageAccount'))]",
+        //"[resourceId('Microsoft.Storage/storageAccounts',parameters('storageAccount'))]",
         "[resourceId('Microsoft.Network/networkInterfaces',parameters('sqlNicName'))]"
       ],
       "properties": {
@@ -203,17 +190,11 @@
           },
           "osDisk": {
             "name": "osdisk",
-            "vhd": {
-              "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('storageAccount')),providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).primaryEndpoints.blob, variables('vmContainerName'),'/', parameters('vmName'), '0','-osdisk.vhd')]"
-            },
             "caching": "ReadWrite",
             "createOption": "FromImage"
           },
           "dataDisks": [
             {
-              "vhd": {
-                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('storageAccount')),providers('Microsoft.Storage','storageAccounts').apiVersions[0]).primaryEndpoints.blob, variables('vmContainerName'),'/',parameters('vmName'),'0','-data-1.vhd')]"
-              },
               "name": "[concat(parameters('vmName'), '0','data-1.vhd')]",
               "caching": "None",
               "createOption": "Empty",
@@ -221,9 +202,6 @@
               "lun": 0
             },
             {
-              "vhd": {
-                "uri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('storageAccount')),providers('Microsoft.Storage','storageAccounts').apiVersions[0]).primaryEndpoints.blob,variables('vmContainerName'),'/', parameters('vmName'), '0','log-1.vhd')]"
-              },
               "name": "[concat(parameters('vmName'), '0','log-1.vhd')]",
               "caching": "None",
               "createOption": "Empty",

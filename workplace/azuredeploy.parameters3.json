@@ -1,0 +1,101 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "deploySharepoint": {
+      "value": "No"
+    },
+    "adminUsername": {
+      "value": "mspadmin"
+    },
+    "virtualNetworkName": {
+      "value": "poc-msp-ds-vnet"
+    },
+    "adminPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/2f2fac68-5142-4bf1-af48-b0cc70af50db/resourceGroups/msphub/providers/Microsoft.KeyVault/vaults/msphubkv"
+        },
+        "secretName": "password"
+      }
+    },
+    "domainName": {
+      "value": "msp.local"
+    },
+    "sharepointPublicIpDnsName": {
+      "value": "mgcsharepoint1405"
+    },
+    "dnsPrefix": {
+      "value": "mgc1405"
+    },
+    "virtualNetworkAddressRange": {
+      "value": "10.30.0.0/16"
+    },
+    "adSubnet": {
+      "value": "10.30.0.0/29"
+    },
+    "appsSubnet": {
+      "value": "10.30.1.0/24"
+    },
+    "adPDCNicIPAddress": {
+      "value": "10.30.0.4"
+    },
+    "adBDCNicIPAddress": {
+      "value": "10.30.0.5"
+    },
+    "exchangeNicIPAddress": {
+      "value": "10.30.1.250"
+    },
+    "gatewaySubnetIpRange": {
+      "value": "10.30.99.0/24"
+    },
+    "sharepoint2016ProductKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/2f2fac68-5142-4bf1-af48-b0cc70af50db/resourceGroups/msphub/providers/Microsoft.KeyVault/vaults/msphubkv"
+        },
+        "secretName": "sharepointProductKey"
+      }
+    },
+    "vpnRootCertData": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/2f2fac68-5142-4bf1-af48-b0cc70af50db/resourceGroups/msphub/providers/Microsoft.KeyVault/vaults/msphubkv"
+        },
+        "secretName": "password"
+      }
+    },
+    "storageAccountType": {
+      "value": "Premium_LRS"
+    },
+    "exchangeISOUri": {
+      "value": "https://download.microsoft.com/download/5/9/6/59681DAE-AB62-4854-8DEC-CA25FFEFE3B3/ExchangeServer2016-x64-cu13.iso"
+    },
+    "sharepoint2016Iso": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/2f2fac68-5142-4bf1-af48-b0cc70af50db/resourceGroups/msphub/providers/Microsoft.KeyVault/vaults/msphubkv"
+        },
+        "secretName": "sharepointIsoUrl"
+      }
+    },
+    "sqlServerIsoUrl": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/2f2fac68-5142-4bf1-af48-b0cc70af50db/resourceGroups/msphub/providers/Microsoft.KeyVault/vaults/msphubkv"
+        },
+        "secretName": "sqlInstallIsoUrl"
+      }
+    },
+    "adVMSize": {
+      "value": "Standard_DS2_v2"
+    },
+    "appsVMSize": {
+      "value": "Standard_DS3_v2"
+    },
+    "sqlVMSize": {
+      "value": "Standard_DS3_v2"
+    }
+  }
+}
+

@@ -3,3 +3,7 @@
 ################################################################################
 
 /workplace/bin/Debug/staging/workplace
+.vs/workplace/v16
+.vs
+*.zip
+workplace/obj

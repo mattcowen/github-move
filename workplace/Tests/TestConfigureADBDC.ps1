@@ -1,4 +1,4 @@
-$creds = (Get-Credential -Message "Domain Admin user" -UserName "azureuser")
+$creds = (Get-Credential -Message "Domain Admin user" -UserName "mcowen")
 
 $configData =@{
     AllNodes = @(
